@@ -32,12 +32,37 @@ export const userQueryOptions = queryOptions({
   staleTime: Infinity,
 });
 
+const allNotes = async () => {
+  const response = await managerClient.api.manager.$get();
+
+  if (response.status !== 200) {
+    throw new Error("Failed to fetch allNOtes");
+  }
+
+  const data = await response.json();
+
+  return data;
+};
+
+export const allNotesQueryOptions = queryOptions({
+  queryKey: ["allNotes"],
+  queryFn: allNotes,
+});
+
 export const createNote = async (title: string, content: string) => {
   const response = await managerClient.api.manager["create"].$post({
     json: {
       title,
       content,
     },
+  });
+  const data = await response.json();
+  return data;
+};
+
+export const deleteNote = async (id: number) => {
+  const response = await managerClient.api.manager[":id"].$delete({
+    param: { id: id.toString() },
   });
   const data = await response.json();
   return data;

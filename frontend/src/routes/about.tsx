@@ -11,23 +11,23 @@ function About() {
       <VStack spacing={8} align="stretch">
         <Heading as="h1">About Me</Heading>
         
-        <Box textAlign="center">
+        <Box display={'flex'} flexDirection={'column'} textAlign="center" gap={2}>
           <Image 
-            src="/path/to/your/profile-picture.jpg" 
-            alt="Your Name" 
+            src="/ribermudez.jpg"
+            alt="Ricardo Bermudez"
             borderRadius="full"
             boxSize="200px"
             objectFit="cover"
             margin="0 auto"
           />
-          <Heading as="h2" size="lg" mt={4}>Your Name</Heading>
+          <Heading as="h2" size="lg" mt={4}>Ricardo Bermudez</Heading>
           <Text fontStyle="italic" color="gray.600">Web Developer | React Enthusiast | Coffee Lover</Text>
         </Box>
         
         <Box>
           <Heading as="h3" size="md">Biography</Heading>
-          <Text>
-            Hello! I'm a passionate web developer with X years of experience in building
+          <Text my={2}>
+            Hello! I'm a passionate web developer with 7+ years of experience in building
             modern web applications. I specialize in React and TypeScript, and I love
             creating intuitive user interfaces that solve real-world problems.
           </Text>
@@ -35,7 +35,7 @@ function About() {
         
         <Box>
           <Heading as="h3" size="md">Skills</Heading>
-          <UnorderedList styleType="none" display="flex" flexWrap="wrap" padding={0}>
+          <UnorderedList styleType="none" display="flex" flexWrap="wrap" padding={0} my={2}>
             {['React', 'TypeScript', 'HTML/CSS', 'Node.js', 'Git'].map((skill) => (
               <ListItem 
                 key={skill} 
@@ -53,10 +53,10 @@ function About() {
         </Box>
         
         <Box>
-          <Heading as="h3" size="md">Get in Touch</Heading>
-          <Text>Email: your.email@example.com</Text>
-          <Link href="https://www.linkedin.com/in/yourprofile" color="blue.500">LinkedIn: linkedin.com/in/yourprofile</Link>
-          <Link href="https://github.com/yourusername" color="blue.500" display="block">GitHub: github.com/yourusername</Link>
+          <Heading as="h3" size="md" mb={2}>Get in Touch</Heading>
+          <Text>Email: ribermudez@petalmail.com</Text>
+          <Link href="https://www.linkedin.com/in/ricardotellez7/" color="blue.500">LinkedIn: ricardotellez7</Link>
+          <Link href="https://github.com/ricardober93" color="blue.500" display="block">GitHub: ricardober93</Link>
         </Box>
       </VStack>
     </Box>

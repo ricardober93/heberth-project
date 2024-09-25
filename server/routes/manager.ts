@@ -4,16 +4,16 @@ import { zValidator } from "@hono/zod-validator";
 import { userMiddleware } from "../kinde";
 
 import { db } from "../db";
-import { notes, notes as notesTable } from "../db/schema";
+import { notes as notesTable } from "../db/schema";
 import { eq } from "drizzle-orm";
 
 export const manager = new Hono()
   .get("/", userMiddleware, async (c) => {
     const user = c.get("user");
-    const allNotes = await db.select().from(notesTable).where(eq(notesTable.userId, user.id));
+    const notes = await db.select().from(notesTable).where(eq(notesTable.userId, user.id));
     return c.json(
       {
-        allNotes,
+        notes,
       },
       200
     );

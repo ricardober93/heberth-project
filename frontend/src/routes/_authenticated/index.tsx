@@ -11,9 +11,21 @@ import {
   Stat,
   StatLabel,
   StatNumber,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  TableCaption,
+  TableContainer,
+  IconButton,
+  useToast,
 } from '@chakra-ui/react'
-import { useQuery } from '@tanstack/react-query'
-import { getNotesQueryOption } from '../../api/manager'
+import { DeleteIcon } from '@chakra-ui/icons'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { getNotesQueryOption, allNotesQueryOptions, deleteNote } from '../../api/manager'
+import { Note } from '../../../../server/models/note'
 
 export const Route = createFileRoute('/_authenticated/')({
   component: () => <App />,
@@ -22,6 +34,8 @@ export const Route = createFileRoute('/_authenticated/')({
 function App() {
   // Assume we have a state to store the notes
   const { data: notes, isLoading, isError } = useQuery(getNotesQueryOption)
+
+  const { data: allNotes } = useQuery(allNotesQueryOptions)
 
   if (isLoading)
     return (
@@ -42,6 +56,7 @@ function App() {
       </Flex>
     )
 
+
   return (
     <Flex direction="column" w="100vw" h="100vh" p={5}>
       <Flex
@@ -60,7 +75,77 @@ function App() {
         </Card>
       </Flex>
 
-      {/* Rest of your app content */}
+
+      <TableContainer>
+        <Table variant='simple'>
+          <TableCaption>Imperial to metric conversion factors</TableCaption>
+          <Thead>
+            <Tr>
+              <Th>Id</Th>
+              <Th>Title</Th>
+              <Th >Content</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {
+              allNotes && (allNotes.notes).map((note: Note) => (
+                <Tr key={note.id}>
+                  <Td>{note.id}</Td>
+                  <Td>{note?.title}</Td>
+                  <Td >{note?.content}</Td>
+                 < Td > <DeleteNoteButton id={note.id} /> </Td>
+                </Tr>
+              ))
+            }
+          </Tbody>
+        </Table>
+      </TableContainer>
     </Flex>
   )
 }
+
+
+function DeleteNoteButton({ id }: { id: number }) {
+  const toast = useToast()
+  const queryClient = useQueryClient();
+  const mutation  = useMutation({
+    mutationFn: deleteNote,
+    onSuccess: () => {
+       
+      queryClient.invalidateQueries({
+        queryKey: allNotesQueryOptions.queryKey,
+        exact: true,
+        refetchType: 'all',
+      });
+
+      toast({
+        title: 'Nota eliminada.',
+        description: "Se ha eliminado la nota correctamente.",
+        status: 'success',
+        duration: 9000,
+        isClosable: true,
+      })
+
+    },
+    onError: () => {
+      toast({
+        title: 'Error al eliminar la nota.',
+        description: "No se ha podido eliminar la nota.",
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+      })
+    }
+  })
+
+  return (
+    <IconButton 
+    variant='ghost'
+    aria-label='Delete'
+    disabled={mutation.isPending}
+    onClick={() => mutation.mutate(id)}>
+      <DeleteIcon color='red'></DeleteIcon>
+    </IconButton>
+  )
+}
+

@@ -3,6 +3,7 @@ import { Box, Button, Flex, Link } from '@chakra-ui/react'
 import { type QueryClient } from '@tanstack/react-query'
 import { userQueryOptions } from '../api/manager'
 
+
 interface MyRouterContext {
   queryClient: QueryClient
 }
@@ -15,23 +16,22 @@ function Navbar() {
       <Link as={RouterLink} to="/" marginRight="4" _activeLink={{ fontWeight: 'bold' }}>
         Notes
       </Link>
-      <Flex gap={4} justifyContent="flex-end">
+      <Flex gap={4} justifyContent="flex-end" alignItems="center">
         <Link as={RouterLink} to="/about" _activeLink={{ fontWeight: 'bold' }}>
           About
         </Link>
         <Link as={RouterLink} to="/create" _activeLink={{ fontWeight: 'bold' }}>
           Create
         </Link>
+        {user && (
+          <Button colorScheme='gray' variant='solid'  as={RouterLink} href="/api/logout" _activeLink={{ fontWeight: 'bold' }}>
+            Logout
+          </Button>
+        )}
       </Flex>
-      {user ? (
-        <Button colorScheme='gray' variant='solid'  as={RouterLink} to="api/logout" _activeLink={{ fontWeight: 'bold' }}>
-          Logout
-        </Button>
-      ) : (
-        <Button colorScheme='gray' variant='solid'  as={RouterLink} to="api/login" _activeLink={{ fontWeight: 'bold' }}>
-          Login
-        </Button>
-      )}
+
+
+
     </Flex>
   </Flex>
   )

@@ -1,12 +1,10 @@
 import { z } from 'zod';
 
 export interface Note {
-  id: string;
-  title: string;
-  content: string;
+  id: number;
   userId: string;
-  createdAt: Date;
-  updatedAt: Date;
+  title: string  | null;
+  content: string | null;
 }
 
 // Zod schema for Note validation
