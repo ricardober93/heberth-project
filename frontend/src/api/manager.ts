@@ -5,7 +5,14 @@ import { hc } from "hono/client";
 const managerClient = hc<ApiManager>("/");
 
 const getNotes = async () => {
-  const response = await managerClient.api.manager["total"].$get();
+  const response = await managerClient.api.manager["total"].$get({}, {
+    credentials: 'include'
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch notes");
+  }
+
   const data = await response.json();
   return data;
 };
@@ -15,32 +22,16 @@ export const getNotesQueryOption = queryOptions({
   queryFn: getNotes,
 });
 
-const getUser = async () => {
-  const response = await managerClient.api.me.$get();
-
-  if (response.status !== 200) {
-    throw new Error("Failed to fetch user");
-  }
-
-  const data = await response.json();
-  return data;
-};
-
-export const userQueryOptions = queryOptions({
-  queryKey: ["currentUser"],
-  queryFn: getUser,
-  staleTime: Infinity,
-});
-
 const allNotes = async () => {
-  const response = await managerClient.api.manager.$get();
+  const response = await managerClient.api.manager.$get({}, {
+    credentials: 'include'
+  });
 
-  if (response.status !== 200) {
-    throw new Error("Failed to fetch allNOtes");
+  if (!response.ok) {
+    throw new Error("Failed to fetch all notes");
   }
 
   const data = await response.json();
-
   return data;
 };
 
@@ -55,7 +46,14 @@ export const createNote = async (title: string, content: string) => {
       title,
       content,
     },
+  }, {
+    credentials: 'include'
   });
+
+  if (!response.ok) {
+    throw new Error("Failed to create note");
+  }
+
   const data = await response.json();
   return data;
 };
@@ -63,7 +61,14 @@ export const createNote = async (title: string, content: string) => {
 export const deleteNote = async (id: number) => {
   const response = await managerClient.api.manager[":id"].$delete({
     param: { id: id.toString() },
+  }, {
+    credentials: 'include'
   });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete note");
+  }
+
   const data = await response.json();
   return data;
 };

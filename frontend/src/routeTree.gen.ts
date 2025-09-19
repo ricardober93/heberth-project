@@ -13,7 +13,13 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as AboutImport } from './routes/about'
 import { Route as AuthenticatedImport } from './routes/_authenticated'
+import { Route as IndexImport } from './routes/index'
 import { Route as AuthenticatedIndexImport } from './routes/_authenticated/index'
+import { Route as TeacherDashboardImport } from './routes/teacher/dashboard'
+import { Route as StudentDashboardImport } from './routes/student/dashboard'
+import { Route as AuthRegisterImport } from './routes/auth/register'
+import { Route as AuthLoginImport } from './routes/auth/login'
+import { Route as AdminDashboardImport } from './routes/admin/dashboard'
 import { Route as AuthenticatedCreateImport } from './routes/_authenticated/create'
 
 // Create/Update Routes
@@ -28,9 +34,39 @@ const AuthenticatedRoute = AuthenticatedImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const IndexRoute = IndexImport.update({
+  path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const AuthenticatedIndexRoute = AuthenticatedIndexImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
+} as any)
+
+const TeacherDashboardRoute = TeacherDashboardImport.update({
+  path: '/teacher/dashboard',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const StudentDashboardRoute = StudentDashboardImport.update({
+  path: '/student/dashboard',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthRegisterRoute = AuthRegisterImport.update({
+  path: '/auth/register',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthLoginRoute = AuthLoginImport.update({
+  path: '/auth/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AdminDashboardRoute = AdminDashboardImport.update({
+  path: '/admin/dashboard',
+  getParentRoute: () => rootRoute,
 } as any)
 
 const AuthenticatedCreateRoute = AuthenticatedCreateImport.update({
@@ -42,6 +78,13 @@ const AuthenticatedCreateRoute = AuthenticatedCreateImport.update({
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -62,6 +105,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/create'
       preLoaderRoute: typeof AuthenticatedCreateImport
       parentRoute: typeof AuthenticatedImport
+    }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/admin/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardImport
+      parentRoute: typeof rootRoute
+    }
+    '/auth/login': {
+      id: '/auth/login'
+      path: '/auth/login'
+      fullPath: '/auth/login'
+      preLoaderRoute: typeof AuthLoginImport
+      parentRoute: typeof rootRoute
+    }
+    '/auth/register': {
+      id: '/auth/register'
+      path: '/auth/register'
+      fullPath: '/auth/register'
+      preLoaderRoute: typeof AuthRegisterImport
+      parentRoute: typeof rootRoute
+    }
+    '/student/dashboard': {
+      id: '/student/dashboard'
+      path: '/student/dashboard'
+      fullPath: '/student/dashboard'
+      preLoaderRoute: typeof StudentDashboardImport
+      parentRoute: typeof rootRoute
+    }
+    '/teacher/dashboard': {
+      id: '/teacher/dashboard'
+      path: '/teacher/dashboard'
+      fullPath: '/teacher/dashboard'
+      preLoaderRoute: typeof TeacherDashboardImport
+      parentRoute: typeof rootRoute
     }
     '/_authenticated/': {
       id: '/_authenticated/'
@@ -90,48 +168,99 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 export interface FileRoutesByFullPath {
+  '/': typeof AuthenticatedIndexRoute
   '': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
   '/create': typeof AuthenticatedCreateRoute
-  '/': typeof AuthenticatedIndexRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
+  '/student/dashboard': typeof StudentDashboardRoute
+  '/teacher/dashboard': typeof TeacherDashboardRoute
 }
 
 export interface FileRoutesByTo {
+  '/': typeof AuthenticatedIndexRoute
   '/about': typeof AboutRoute
   '/create': typeof AuthenticatedCreateRoute
-  '/': typeof AuthenticatedIndexRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
+  '/student/dashboard': typeof StudentDashboardRoute
+  '/teacher/dashboard': typeof TeacherDashboardRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
+  '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
   '/_authenticated/create': typeof AuthenticatedCreateRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
+  '/auth/login': typeof AuthLoginRoute
+  '/auth/register': typeof AuthRegisterRoute
+  '/student/dashboard': typeof StudentDashboardRoute
+  '/teacher/dashboard': typeof TeacherDashboardRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/about' | '/create' | '/'
+  fullPaths:
+    | '/'
+    | ''
+    | '/about'
+    | '/create'
+    | '/admin/dashboard'
+    | '/auth/login'
+    | '/auth/register'
+    | '/student/dashboard'
+    | '/teacher/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/about' | '/create' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/create'
+    | '/admin/dashboard'
+    | '/auth/login'
+    | '/auth/register'
+    | '/student/dashboard'
+    | '/teacher/dashboard'
   id:
     | '__root__'
+    | '/'
     | '/_authenticated'
     | '/about'
     | '/_authenticated/create'
+    | '/admin/dashboard'
+    | '/auth/login'
+    | '/auth/register'
+    | '/student/dashboard'
+    | '/teacher/dashboard'
     | '/_authenticated/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
+  AdminDashboardRoute: typeof AdminDashboardRoute
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthRegisterRoute: typeof AuthRegisterRoute
+  StudentDashboardRoute: typeof StudentDashboardRoute
+  TeacherDashboardRoute: typeof TeacherDashboardRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
+  AdminDashboardRoute: AdminDashboardRoute,
+  AuthLoginRoute: AuthLoginRoute,
+  AuthRegisterRoute: AuthRegisterRoute,
+  StudentDashboardRoute: StudentDashboardRoute,
+  TeacherDashboardRoute: TeacherDashboardRoute,
 }
 
 export const routeTree = rootRoute
@@ -146,9 +275,18 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
+        "/",
         "/_authenticated",
-        "/about"
+        "/about",
+        "/admin/dashboard",
+        "/auth/login",
+        "/auth/register",
+        "/student/dashboard",
+        "/teacher/dashboard"
       ]
+    },
+    "/": {
+      "filePath": "index.tsx"
     },
     "/_authenticated": {
       "filePath": "_authenticated.tsx",
@@ -163,6 +301,21 @@ export const routeTree = rootRoute
     "/_authenticated/create": {
       "filePath": "_authenticated/create.tsx",
       "parent": "/_authenticated"
+    },
+    "/admin/dashboard": {
+      "filePath": "admin/dashboard.tsx"
+    },
+    "/auth/login": {
+      "filePath": "auth/login.tsx"
+    },
+    "/auth/register": {
+      "filePath": "auth/register.tsx"
+    },
+    "/student/dashboard": {
+      "filePath": "student/dashboard.tsx"
+    },
+    "/teacher/dashboard": {
+      "filePath": "teacher/dashboard.tsx"
     },
     "/_authenticated/": {
       "filePath": "_authenticated/index.tsx",

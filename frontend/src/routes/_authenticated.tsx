@@ -1,35 +1,18 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
-import { userQueryOptions } from '../api/manager'
-import { Flex, Card, Link } from '@chakra-ui/react'
-
-const Login = () => {
-  return <Flex>
-    <Card p={4} bg={'gray.100'}>
-      <Link href="api/login">Login</Link>
-    </Card>
-  </Flex>
-}
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import { AuthGuard } from '../components/auth/AuthGuard'
+import { LoginForm } from '../components/auth/LoginForm'
 
 const Component = () => {
-  const { user } = Route.useRouteContext()
-    if (!user) {
-      return <Login />
-    }
-
-    return <Outlet />
-  }
-
+  return (
+    <AuthGuard
+      fallback={<LoginForm />}
+    >
+      <Outlet />
+    </AuthGuard>
+  )
+}
 
 // src/routes/_authenticated.tsx
 export const Route = createFileRoute('/_authenticated')({
-  beforeLoad: async ({context}) => {
-    try {
-      const data = await context.queryClient.fetchQuery(userQueryOptions)
-      return data
-    } catch (error) {
-      console.error(error)
-      return { user: null }
-    }
-  },
-  component: Component,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+  component: Component,
 })
