@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { AuthGuard } from '../components/auth/AuthGuard'
 import { LoginForm } from '../components/auth/LoginForm'
 

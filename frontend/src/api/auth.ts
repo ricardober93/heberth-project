@@ -71,11 +71,6 @@ const getCurrentUser = async (): Promise<any> => {
   }
 
   const res = await response.json() as any;
-
-
-  console.log("Roles obtenidos:", res);
-  
-
  const data = { ...res};
 
   return data;

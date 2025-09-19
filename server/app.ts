@@ -43,8 +43,8 @@ app.use(
 
 const managerRoute = app
   .basePath("/api")
-  .route("/", auth)
   .route("/manager", manager)
+  .route("/", auth)
   .route("/admin", admin)
   .route("/user", user);
 

@@ -1,103 +1,154 @@
 import { Hono } from "hono";
-import { CreateNoteValidationSchema, type Note } from "../models/note";
 import { zValidator } from "@hono/zod-validator";
-import { authMiddleware, requireRole, ROLES, type AuthContext } from "../auth/middleware";
+import {
+  authMiddleware,
+  requireRole,
+  ROLES,
+  type AuthContext,
+} from "../auth/middleware";
 
 import { db } from "../db";
-import { notes as notesTable } from "../db/schema";
-import { eq } from "drizzle-orm";
+import { roles, userRoles, user as userTable } from "../db/schema";
+import { eq, not } from "drizzle-orm";
+import { auth } from "../auth/config";
 
-export const manager = new Hono<{ Variables: { user: { id: string; name: string; email: string; roles?: string[]}}}>()
-  .get("/", authMiddleware, requireRole(ROLES.TEACHER, ROLES.SUPER_ADMIN), async (c: AuthContext) => {
-    const user = c.user!;
-    const notes = await db.select().from(notesTable).where(eq(notesTable.userId, user.id));
-    return c.json(
-      {
-        notes,
-      },
-      200
-    );
-  }) // GET /book
-  .get("/:id{[0-9]+}", authMiddleware, requireRole(ROLES.TEACHER, ROLES.SUPER_ADMIN), async (c: AuthContext) => {
-    // GET /manager/:id
-    const id = Number(c.req.param("id"));
-    const note = await db.select().from(notesTable).where(eq(notesTable.id, id));
+const manager = new Hono()
+  .get(
+    "/",
+    authMiddleware,
+    requireRole(ROLES.TEACHER, ROLES.SUPER_ADMIN),
+    async (c) => {
+      
+      const users = await db
+        .select()
+        .from(userTable)
+        .leftJoin(
+          userRoles,
+          eq(userTable.id, userRoles.userId)
+        )
+        .leftJoin(roles, eq(userRoles.roleId, roles.id))
+        .where(not(eq(userRoles.roleId, 1))); // Excluye usuarios con rol 1
 
-    if (!note) {
-      return c.status(404);
+      // Si quieres excluir explícitamente a los super_admin:
+      // .where(neq(userRoles.roleId, ROLES.SUPER_ADMIN))
+      return c.json(
+        {
+          users,
+        },
+        200
+      );
     }
-    return c.json(
-      {
-        note,
-      },
-      200
-    );
-  })
-  .get("/total", authMiddleware, requireRole(ROLES.TEACHER, ROLES.SUPER_ADMIN), async (c: AuthContext) => {
-    const user = c.user!;
-    const totalNotes = (await db.select().from(notesTable).where(eq(notesTable.userId, user.id))).length;
+  ) // GET /book
+  .get(
+    "/:id{[0-9]+}",
+    authMiddleware,
+    requireRole(ROLES.TEACHER, ROLES.SUPER_ADMIN),
+    async (c: AuthContext) => {
+      // GET /manager/:id
+      const id = c.req.param("id");
+      const user = await db
+        .select()
+        .from(userTable)
+        .where(eq(userTable.id, id));
 
-    return await c.json(
-      {
-        totalNotes,
-      },
-      200
-    );
-  })
-  .post("/create", authMiddleware, requireRole(ROLES.TEACHER, ROLES.SUPER_ADMIN), zValidator("json", CreateNoteValidationSchema), async (c: AuthContext) => {
-    const body = (await c.req.json()) as Note;
-    const user = c.user!;
-
-    const newNote = await db.insert(notesTable).values({
-      userId: user.id,
-      title: body.title,
-      content: body.content,
-    });
-    return c.json(
-      {
-        newNote,
-      },
-      200
-    );
-  }) // POST
-  .put("/:id{[0-9]+}", authMiddleware, requireRole(ROLES.TEACHER, ROLES.SUPER_ADMIN), async (c: AuthContext) => {
-    const id = Number(c.req.param("id"));
-    const body = (await c.req.json()) as Note;
-
-    const note = await db.select().from(notesTable).where(eq(notesTable.id, id));
-
-    if (!note) {
-      return c.status(404);
+      if (!user) {
+        return c.status(404);
+      }
+      return c.json(
+        {
+          user,
+        },
+        200
+      );
     }
-    const updatedNote = await db
-      .update(notesTable)
-      .set({
-        title: body.title,
-        content: body.content,
-      })
-      .where(eq(notesTable.id, id));
-    return c.json(
-      {
-        updatedNote,
-      },
-      200
-    );
-  }) // PUT
-  .delete("/:id", authMiddleware, requireRole(ROLES.TEACHER, ROLES.SUPER_ADMIN), async (c: AuthContext) => {
-    const id = Number(c.req.param("id"));
+  )
+  .post(
+    "/create",
+    authMiddleware,
+    requireRole(ROLES.TEACHER, ROLES.SUPER_ADMIN),
+    async (c: AuthContext) => {
+      const body = await c.req.json();
 
-    const note = await db.select().from(notesTable).where(eq(notesTable.id, id));
+      const newUser = await auth.api.signUpEmail({
+        body: {
+          email: body.email,
+          password: body.password,
+          name: body.name,
+        },
+      });
 
-    if (!note) {
-      return c.status(404);
+      await db
+        .update(userRoles)
+        .set({
+          userId: newUser.user?.id || "",
+          roleId: 1,
+        })
+        .where(eq(userTable.id, newUser.user?.id));
+
+      return c.json(
+        {
+          newUser,
+        },
+        200
+      );
     }
+  ) // POST
+  .put(
+    "/:id{[0-9]+}",
+    authMiddleware,
+    requireRole(ROLES.TEACHER, ROLES.SUPER_ADMIN),
+    async (c: AuthContext) => {
+      const id = c.req.param("id");
+      const body = await c.req.json();
 
-    const deletedNote = await db.delete(notesTable).where(eq(notesTable.id, id));
+      const note = await db
+        .select()
+        .from(userTable)
+        .where(eq(userTable.id, id));
 
-    return c.json(
-      {
-        deletedNote,
-      },
-      200
-    );
-  }); // DELETE
+      if (!note) {
+        return c.status(404);
+      }
+      const updateUser = await db
+        .update(userTable)
+        .set({
+          name: body.name,
+          email: body.email,
+        })
+        .where(eq(userTable.id, id));
+      return c.json(
+        {
+          updateUser,
+        },
+        200
+      );
+    }
+  ) // PUT
+  .delete(
+    "/:id",
+    authMiddleware,
+    requireRole(ROLES.TEACHER, ROLES.SUPER_ADMIN),
+    async (c: AuthContext) => {
+      const id = c.req.param("id");
+
+      const user = await db
+        .select()
+        .from(userTable)
+        .where(eq(userTable.id, id));
+
+      if (!user) {
+        return c.status(404);
+      }
+
+      const userDelete = await db.delete(userTable).where(eq(userTable.id, id));
+
+      return c.json(
+        {
+          userDelete,
+        },
+        200
+      );
+    }
+  ); // DELETE
+
+export { manager };

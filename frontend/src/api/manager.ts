@@ -4,40 +4,39 @@ import { hc } from "hono/client";
 
 const managerClient = hc<ApiManager>("/");
 
-const getNotes = async () => {
-  const response = await managerClient.api.manager["total"].$get({}, {
-  });
+const getAllStudent = async () => {
+  const response = await managerClient.api.manager.$get()
 
   if (!response.ok) {
     throw new Error("Failed to fetch notes");
   }
 
   const data = await response.json();
-  return data;
-};
 
-export const getNotesQueryOption = queryOptions({
-  queryKey: ["notes"],
-  queryFn: getNotes,
-});
-
-const allNotes = async () => {
-  const response = await managerClient.api.manager.$get({}, {
-
+  const students = data.users.filter((user) => {
+    return user.roles && user.roles.name === "STUDENT" ;
   });
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch all notes");
-  }
+  const teachers = data.users.filter((user) => {
+    return user.roles && user.roles.name === "TEACHER" ;
+  });
 
-  const data = await response.json();
-  return data;
+  const totalUsers = data.users.length;
+
+  
+  return {
+    users: data.users,
+    students,
+    teachers,
+    totalUsers,
+  };
 };
 
-export const allNotesQueryOptions = queryOptions({
-  queryKey: ["allNotes"],
-  queryFn: allNotes,
+export const getAllStudentQueryOption = queryOptions({
+  queryKey: ["students"],
+  queryFn: getAllStudent,
 });
+
 
 export const createNote = async (title: string, content: string) => {
   const response = await managerClient.api.manager["create"].$post({
