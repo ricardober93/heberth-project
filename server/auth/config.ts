@@ -13,6 +13,7 @@ export const auth = betterAuth({
       verification,
     },
   }),
+  trustedOrigins: ["http://localhost:3000", "http://localhost:5173"],
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,
@@ -30,5 +31,5 @@ export const auth = betterAuth({
   },
 });
 
-export type Session = typeof auth.$Infer.Session;
+export type Session = typeof auth.$Infer.Session.session;
 export type User = typeof auth.$Infer.Session.user;

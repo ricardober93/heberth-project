@@ -6,7 +6,6 @@ const managerClient = hc<ApiManager>("/");
 
 const getNotes = async () => {
   const response = await managerClient.api.manager["total"].$get({}, {
-    credentials: 'include'
   });
 
   if (!response.ok) {
@@ -24,7 +23,7 @@ export const getNotesQueryOption = queryOptions({
 
 const allNotes = async () => {
   const response = await managerClient.api.manager.$get({}, {
-    credentials: 'include'
+
   });
 
   if (!response.ok) {
@@ -47,7 +46,6 @@ export const createNote = async (title: string, content: string) => {
       content,
     },
   }, {
-    credentials: 'include'
   });
 
   if (!response.ok) {
@@ -62,7 +60,6 @@ export const deleteNote = async (id: number) => {
   const response = await managerClient.api.manager[":id"].$delete({
     param: { id: id.toString() },
   }, {
-    credentials: 'include'
   });
 
   if (!response.ok) {

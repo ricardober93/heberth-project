@@ -1,5 +1,9 @@
 import { queryOptions } from "@tanstack/react-query";
-import type { RegisterData, LoginData, AuthUser, User } from "../types/auth";
+import type { RegisterData, LoginData } from "../types/auth";
+import { hc } from "hono/client";
+import { type  ApiManager } from "../../../server/app";
+
+const authClient = hc<ApiManager>("/");
 
 const API_BASE = "/api";
 
@@ -24,12 +28,16 @@ export const registerStudent = async (data: RegisterData) => {
 
 // Login
 export const login = async (data: LoginData) => {
-  const response = await fetch(`${API_BASE}/auth/sign-in`, {
+
+  const response = await fetch(`${API_BASE}/auth/sign-in/email`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      email: data.email,
+      password: data.password,
+    }),
     credentials: 'include',
   });
 
@@ -38,7 +46,7 @@ export const login = async (data: LoginData) => {
     throw new Error(error.error || 'Error en el login');
   }
 
-  return response.json();
+  return await  response.json();
 };
 
 // Logout
@@ -56,16 +64,20 @@ export const logout = async () => {
 };
 
 // Obtener usuario actual
-const getCurrentUser = async (): Promise<AuthUser> => {
-  const response = await fetch(`${API_BASE}/me`, {
-    credentials: 'include',
-  });
-
+const getCurrentUser = async (): Promise<any> => {
+  const response = await authClient.api.me.$get();
   if (!response.ok) {
     throw new Error('No autorizado');
   }
 
-  const data = await response.json();
+  const res = await response.json() as any;
+
+
+  console.log("Roles obtenidos:", res);
+  
+
+ const data = { ...res};
+
   return data;
 };
 

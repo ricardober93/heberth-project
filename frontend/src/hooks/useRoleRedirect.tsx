@@ -15,6 +15,7 @@ const ROLE_ROUTES: RoleRoutes = {
 
 export function useRoleRedirect() {
   const { user, isAuthenticated, isLoading } = useAuth();
+
   const router = useRouter();
 
   useEffect(() => {

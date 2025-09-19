@@ -7,7 +7,7 @@ import { db } from "../db";
 import { notes as notesTable } from "../db/schema";
 import { eq } from "drizzle-orm";
 
-export const manager = new Hono<{ Variables: { user: { id: string; name: string; email: string; roles?: string[] } } }>()
+export const manager = new Hono<{ Variables: { user: { id: string; name: string; email: string; roles?: string[]}}}>()
   .get("/", authMiddleware, requireRole(ROLES.TEACHER, ROLES.SUPER_ADMIN), async (c: AuthContext) => {
     const user = c.user!;
     const notes = await db.select().from(notesTable).where(eq(notesTable.userId, user.id));

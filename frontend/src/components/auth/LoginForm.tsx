@@ -34,8 +34,10 @@ export function LoginForm() {
     setIsLoading(true);
 
     try {
-      await login(formData);
+      const response = await login(formData);
       // La redirección se manejará automáticamente por el hook useRoleRedirect
+
+      
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error en el login');
     } finally {

@@ -36,7 +36,7 @@ export async function seedRoles() {
 export async function seedUsers() {
   try {
     // Crear usuario Super Admin
-    const superAdminUser = await auth.api.signUp({
+    const superAdminUser = await auth.api.signUpEmail({
       body: {
         name: 'Super Admin',
         email: 'admin@example.com',
@@ -50,7 +50,7 @@ export async function seedUsers() {
     }
 
     // Crear usuario Teacher
-    const teacherUser = await auth.api.signUp({
+    const teacherUser = await auth.api.signUpEmail({
       body: {
         name: 'Profesor Demo',
         email: 'teacher@example.com',
@@ -64,7 +64,7 @@ export async function seedUsers() {
     }
 
     // Crear usuario Student
-    const studentUser = await auth.api.signUp({
+    const studentUser = await auth.api.signUpEmail({
       body: {
         name: 'Estudiante Demo',
         email: 'student@example.com',
