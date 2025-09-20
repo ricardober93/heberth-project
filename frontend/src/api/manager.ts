@@ -55,6 +55,25 @@ export const createNote = async (title: string, content: string) => {
   return data;
 };
 
+export const createUserTeacherOrAdmin = async (name: string, email: string, password: string, role: string) => {
+  const response = await managerClient.api.manager["create-user"].$post({
+    json: {
+      name,
+      email,
+      password,
+      role,
+    },
+  }, {
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create user");
+  }
+
+  const data = await response.json();
+  return data;
+}
+
 export const deleteNote = async (id: number) => {
   const response = await managerClient.api.manager[":id"].$delete({
     param: { id: id.toString() },

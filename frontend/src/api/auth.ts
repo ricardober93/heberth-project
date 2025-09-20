@@ -85,13 +85,17 @@ export const currentUserQueryOptions = queryOptions({
 
 // Obtener roles disponibles
 export const getRoles = async () => {
-  const response = await fetch(`${API_BASE}/roles`, {
-    credentials: 'include',
-  });
-
+  const response = await authClient.api.roles.$get();
+  
   if (!response.ok) {
     throw new Error('Error al obtener roles');
   }
-
-  return response.json();
+  const data = await response.json();  
+  return data;
 };
+
+export const getRolesQueryOptions = queryOptions({
+  queryKey: ["roles"],
+  queryFn: getRoles,
+  staleTime: 10 * 60 * 1000, // 10 minutos
+});

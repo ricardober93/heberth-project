@@ -29,8 +29,6 @@ const manager = new Hono()
         .leftJoin(roles, eq(userRoles.roleId, roles.id))
         .where(not(eq(userRoles.roleId, 1))); // Excluye usuarios con rol 1
 
-      // Si quieres excluir explícitamente a los super_admin:
-      // .where(neq(userRoles.roleId, ROLES.SUPER_ADMIN))
       return c.json(
         {
           users,
@@ -65,7 +63,6 @@ const manager = new Hono()
   .post(
     "/create",
     authMiddleware,
-    requireRole(ROLES.TEACHER, ROLES.SUPER_ADMIN),
     async (c: AuthContext) => {
       const body = await c.req.json();
 
@@ -84,6 +81,45 @@ const manager = new Hono()
           roleId: 1,
         })
         .where(eq(userTable.id, newUser.user?.id));
+
+      return c.json(
+        {
+          newUser,
+        },
+        200
+      );
+    }
+  ) // POST
+    .post(
+    "/create-user",
+    authMiddleware,
+    requireRole(ROLES.TEACHER, ROLES.SUPER_ADMIN),
+    async (c: AuthContext) => {
+      const body = await c.req.json() as {
+        name: string;
+        email: string;
+        password: string;
+        role: string;
+      };
+
+      const newUser = await auth.api.signUpEmail({
+        body: {
+          email: body.email,
+          password: body.password,
+          name: body.name,
+        },
+      });
+
+      const rolesData = await db.select().from(roles).where(eq(roles.name, body.role));
+
+      if (rolesData.length === 0) {
+        return c.json({ error: "Rol no válido" }, 400);
+      }
+
+     await db.insert(userRoles).values({
+      userId:newUser.user?.id || "",
+      roleId: rolesData[0].id
+    });
 
       return c.json(
         {

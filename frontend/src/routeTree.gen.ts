@@ -19,6 +19,8 @@ import { Route as StudentDashboardImport } from './routes/student/dashboard'
 import { Route as AuthRegisterImport } from './routes/auth/register'
 import { Route as AuthLoginImport } from './routes/auth/login'
 import { Route as AdminDashboardImport } from './routes/admin/dashboard'
+import { Route as AdminUsersIndexImport } from './routes/admin/users/index'
+import { Route as AdminCreateIndexImport } from './routes/admin/create/index'
 
 // Create/Update Routes
 
@@ -59,6 +61,16 @@ const AuthLoginRoute = AuthLoginImport.update({
 
 const AdminDashboardRoute = AdminDashboardImport.update({
   path: '/admin/dashboard',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AdminUsersIndexRoute = AdminUsersIndexImport.update({
+  path: '/admin/users/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AdminCreateIndexRoute = AdminCreateIndexImport.update({
+  path: '/admin/create/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -122,6 +134,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TeacherDashboardImport
       parentRoute: typeof rootRoute
     }
+    '/admin/create/': {
+      id: '/admin/create/'
+      path: '/admin/create'
+      fullPath: '/admin/create'
+      preLoaderRoute: typeof AdminCreateIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/admin/users/': {
+      id: '/admin/users/'
+      path: '/admin/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -136,6 +162,8 @@ export interface FileRoutesByFullPath {
   '/auth/register': typeof AuthRegisterRoute
   '/student/dashboard': typeof StudentDashboardRoute
   '/teacher/dashboard': typeof TeacherDashboardRoute
+  '/admin/create': typeof AdminCreateIndexRoute
+  '/admin/users': typeof AdminUsersIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -147,6 +175,8 @@ export interface FileRoutesByTo {
   '/auth/register': typeof AuthRegisterRoute
   '/student/dashboard': typeof StudentDashboardRoute
   '/teacher/dashboard': typeof TeacherDashboardRoute
+  '/admin/create': typeof AdminCreateIndexRoute
+  '/admin/users': typeof AdminUsersIndexRoute
 }
 
 export interface FileRoutesById {
@@ -159,6 +189,8 @@ export interface FileRoutesById {
   '/auth/register': typeof AuthRegisterRoute
   '/student/dashboard': typeof StudentDashboardRoute
   '/teacher/dashboard': typeof TeacherDashboardRoute
+  '/admin/create/': typeof AdminCreateIndexRoute
+  '/admin/users/': typeof AdminUsersIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -172,6 +204,8 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/student/dashboard'
     | '/teacher/dashboard'
+    | '/admin/create'
+    | '/admin/users'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -182,6 +216,8 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/student/dashboard'
     | '/teacher/dashboard'
+    | '/admin/create'
+    | '/admin/users'
   id:
     | '__root__'
     | '/'
@@ -192,6 +228,8 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/student/dashboard'
     | '/teacher/dashboard'
+    | '/admin/create/'
+    | '/admin/users/'
   fileRoutesById: FileRoutesById
 }
 
@@ -204,6 +242,8 @@ export interface RootRouteChildren {
   AuthRegisterRoute: typeof AuthRegisterRoute
   StudentDashboardRoute: typeof StudentDashboardRoute
   TeacherDashboardRoute: typeof TeacherDashboardRoute
+  AdminCreateIndexRoute: typeof AdminCreateIndexRoute
+  AdminUsersIndexRoute: typeof AdminUsersIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -215,6 +255,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRegisterRoute: AuthRegisterRoute,
   StudentDashboardRoute: StudentDashboardRoute,
   TeacherDashboardRoute: TeacherDashboardRoute,
+  AdminCreateIndexRoute: AdminCreateIndexRoute,
+  AdminUsersIndexRoute: AdminUsersIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -236,7 +278,9 @@ export const routeTree = rootRoute
         "/auth/login",
         "/auth/register",
         "/student/dashboard",
-        "/teacher/dashboard"
+        "/teacher/dashboard",
+        "/admin/create/",
+        "/admin/users/"
       ]
     },
     "/": {
@@ -262,6 +306,12 @@ export const routeTree = rootRoute
     },
     "/teacher/dashboard": {
       "filePath": "teacher/dashboard.tsx"
+    },
+    "/admin/create/": {
+      "filePath": "admin/create/index.tsx"
+    },
+    "/admin/users/": {
+      "filePath": "admin/users/index.tsx"
     }
   }
 }

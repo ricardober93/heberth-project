@@ -18,7 +18,7 @@ const signUpSchema = z.object({
 
 // Rutas de autenticación usando better-auth
 const auth = new Hono()
-.post(
+  .post(
     "/register",
     zValidator("json", signUpSchema),
     async (c) => {
@@ -61,8 +61,10 @@ const auth = new Hono()
     } // Ruta para obtener información del usuario actual
   )
   .get("/roles", async (c) => {
+    const rolesData = await db.select().from(roles);
+
     return c.json({
-      roles: Object.values(ROLES),
+      rolesData,
     });
   })
   .get("/me", authMiddleware, async (c) => {
@@ -76,8 +78,7 @@ const auth = new Hono()
       .innerJoin(roles, eq(userRoles.roleId, roles.id))
       .where(eq(userRoles.userId, user.id));
 
-    const userRol = userRolesResult.map(r => r.roleName);
-
+    const userRol = userRolesResult.map((r) => r.roleName);
 
     if (!user) return c.body(null, 401);
     return c.json({
@@ -87,7 +88,6 @@ const auth = new Hono()
   })
   .on(["POST", "GET"], "*", (c) => {
     return betterAuth.handler(c.req.raw);
-  })
-  
+  });
 
 export { auth };
