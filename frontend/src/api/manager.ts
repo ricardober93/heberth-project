@@ -1,6 +1,8 @@
 import { queryOptions } from "@tanstack/react-query";
 import { type ApiManager } from "../../../server/app";
 import { hc } from "hono/client";
+import { User } from "better-auth";
+import { usersResponse } from "@server/models/users";
 
 const managerClient = hc<ApiManager>("/");
 
@@ -73,6 +75,29 @@ export const createUserTeacherOrAdmin = async (name: string, email: string, pass
   const data = await response.json();
   return data;
 }
+
+
+export const getAllUser = async (page: string,  limit: string, sortBy: string, sortOrder: string, search: string) => {
+  const response = await managerClient.api.manager.users.$get({
+    query: { page: page.toString(), limit: '10' },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch notes");
+  }
+
+  const data = await response.json();
+
+  return data as usersResponse;
+}
+
+export const getAllUserQueryOption = queryOptions({
+  queryKey: ["users"],
+  queryFn: ({ queryKey }) => {
+    const page = queryKey[1] as string;
+    return getAllUser(page);
+  },
+});
 
 export const deleteNote = async (id: number) => {
   const response = await managerClient.api.manager[":id"].$delete({
